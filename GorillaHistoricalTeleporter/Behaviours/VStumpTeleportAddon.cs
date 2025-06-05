@@ -42,18 +42,14 @@ namespace GorillaHistoricalTeleporter.Behaviours
                 .ForEach(collider =>
                 {
                     if (collider.GetComponent<GorillaSurfaceOverride>() is null)
-                        collider.gameObject.AddComponent<GorillaSurfaceOverride>().overrideIndex = (int)SurfaceSoundOverride.metalhandtap;
+                        collider.gameObject.AddComponent<GorillaSurfaceOverride>().overrideIndex = (int)SurfaceSoundOverride.ConcreteHit;
                 });
 
             teleporterDecor.AddComponent<VStumpExternalTrigger>().Teleporter = Teleporter;
             SetActive(!UGCPermissionManager.IsUGCDisabled);
 
             treeRoom = gameObject.GetParentObjectWithTag(UnityTag.ZoneRoot.ToString(), out stumpVRHeadset);
-            if (treeRoom)
-            {
-                ConfigureTreeRoom(false);
-                ConfigureHeadset(false, false);
-            }
+            ConfigureHeadset(false, false);
         }
 
         public void OnDestroy()
@@ -61,11 +57,11 @@ namespace GorillaHistoricalTeleporter.Behaviours
             GetComponent<Collider>().enabled = true;
 
             Teleporter.stayInTriggerDuration = stayInTriggerDuration;
+            Teleporter.ShowHandHolds();
 
             if (teleporterDecor)
                 Destroy(teleporterDecor);
 
-            ConfigureTreeRoom(true);
             ConfigureHeadset(true, true);
         }
 
@@ -110,17 +106,6 @@ namespace GorillaHistoricalTeleporter.Behaviours
                 inactive.gameObject.SetActive(!isActive);
         }
 
-        public void ConfigureTreeRoom(bool renderMeshes)
-        {
-            if (treeRoom is null)
-                return;
-
-            if (treeRoom.transform.Find(Constants.CombinedMeshName) is Transform combinedMeshTransform && combinedMeshTransform.TryGetComponent(out MeshRenderer combinedRenderer))
-                combinedRenderer.forceRenderingOff = !renderMeshes;
-            if (treeRoom.transform.Find(Constants.TempMeshName) is Transform tempMeshTransform && tempMeshTransform.TryGetComponent(out MeshRenderer tempRenderer))
-                tempRenderer.forceRenderingOff = !renderMeshes;
-        }
-
         public void ConfigureHeadset(bool renderMeshes, bool enableColliders)
         {
             if (stumpVRHeadset is null)
@@ -129,7 +114,12 @@ namespace GorillaHistoricalTeleporter.Behaviours
             foreach (Transform child in stumpVRHeadset.transform)
             {
                 if (child.GetComponent<MeshRenderer>() is MeshRenderer renderer)
+                {
                     renderer.forceRenderingOff = !renderMeshes;
+                    string materialName = renderer.material.name.Replace(" (Instance)", "");
+                    if (treeRoom.transform.Find(string.Concat(materialName, " (combined by EdMeshCombiner)")) is Transform combinedMesh)
+                        combinedMesh.gameObject.SetActive(renderMeshes);
+                }
                 if (child.GetComponent<Collider>() is Collider collider)
                     collider.enabled = enableColliders;
             }
