@@ -4,7 +4,7 @@ using Oculus.Platform;
 
 namespace GorillaHistoricalTeleporter.Patches
 {
-    [HarmonyPatch(typeof(GorillaMetaReport), nameof(GorillaMetaReport.Start))]
+    [HarmonyPatch(typeof(GorillaMetaReport), nameof(GorillaMetaReport.Start)), HarmonyWrapSafe]
     public class MetaReportBoardPatch
     {
         public static void Finalizer(GorillaMetaReport __instance, Exception __exception)

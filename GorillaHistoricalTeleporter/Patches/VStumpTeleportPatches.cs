@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GorillaHistoricalTeleporter.Patches
 {
-    [HarmonyPatch(typeof(VirtualStumpTeleporter))]
+    [HarmonyPatch(typeof(VirtualStumpTeleporter)), HarmonyWrapSafe]
     public class VStumpTeleportPatches
     {
         [HarmonyPatch(nameof(VirtualStumpTeleporter.OnEnable)), HarmonyPrefix]
@@ -49,6 +49,20 @@ namespace GorillaHistoricalTeleporter.Patches
         public static bool UpdateTextPatch(VirtualStumpTeleporter __instance)
         {
             return !__instance.TryGetComponent(out VStumpTeleportAddon component) || component.UpdateCountdownText();
+        }
+
+        [HarmonyPatch(nameof(VirtualStumpTeleporter.OnUGCEnabled)), HarmonyPrefix]
+        public static void UGCEnablePatch(VirtualStumpTeleporter __instance)
+        {
+            if (__instance.TryGetComponent(out VStumpTeleportAddon component))
+                component.OnUGCEnabled();
+        }
+
+        [HarmonyPatch(nameof(VirtualStumpTeleporter.OnUGCDisabled)), HarmonyPrefix]
+        public static void UGCDisablePatch(VirtualStumpTeleporter __instance)
+        {
+            if (__instance.TryGetComponent(out VStumpTeleportAddon component))
+                component.OnUGCDisabled();
         }
     }
 }

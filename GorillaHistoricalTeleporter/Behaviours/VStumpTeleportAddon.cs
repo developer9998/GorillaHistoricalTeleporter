@@ -46,6 +46,7 @@ namespace GorillaHistoricalTeleporter.Behaviours
                 });
 
             teleporterDecor.AddComponent<VStumpExternalTrigger>().Teleporter = Teleporter;
+            SetActive(!UGCPermissionManager.IsUGCDisabled);
 
             treeRoom = gameObject.GetParentObjectWithTag(UnityTag.ZoneRoot.ToString(), out stumpVRHeadset);
             if (treeRoom)
@@ -68,11 +69,44 @@ namespace GorillaHistoricalTeleporter.Behaviours
             ConfigureHeadset(true, true);
         }
 
+        public void OnUGCEnabled()
+            => SetActive(true);
+
+        public void OnUGCDisabled()
+            => SetActive(false);
+
+        public bool HideHandHolds()
+            => true;
+
+        public bool ShowHandHolds()
+        {
+            Teleporter.HideHandHolds();
+            return false;
+        }
+
+        public bool HideCountdownText()
+            => true;
+
+        public bool ShowCountdownText()
+        {
+            Teleporter.HideCountdownText();
+            return false;
+        }
+
+        public bool UpdateCountdownText()
+        {
+            Teleporter.HideCountdownText();
+            return false;
+        }
+
         public void SetActive(bool isActive)
         {
+            if (teleporterDecor is null)
+                return;
+
             if (teleporterDecor.transform.Find("Active") is Transform active)
                 active.gameObject.SetActive(isActive);
-            if (teleporterDecor.transform.Find("Active") is Transform inactive)
+            if (teleporterDecor.transform.Find("Inactive") is Transform inactive)
                 inactive.gameObject.SetActive(!isActive);
         }
 
@@ -99,30 +133,6 @@ namespace GorillaHistoricalTeleporter.Behaviours
                 if (child.GetComponent<Collider>() is Collider collider)
                     collider.enabled = enableColliders;
             }
-        }
-
-        public bool HideHandHolds()
-            => true;
-
-        public bool ShowHandHolds()
-        {
-            Teleporter.HideHandHolds();
-            return false;
-        }
-
-        public bool HideCountdownText()
-            => true;
-
-        public bool ShowCountdownText()
-        {
-            Teleporter.HideCountdownText();
-            return false;
-        }
-
-        public bool UpdateCountdownText()
-        {
-            Teleporter.HideCountdownText();
-            return false;
         }
     }
 }
