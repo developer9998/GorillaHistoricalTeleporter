@@ -1,6 +1,6 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Oculus.Platform;
+using System;
 
 namespace GorillaHistoricalTeleporter.Patches
 {

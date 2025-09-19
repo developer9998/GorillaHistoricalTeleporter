@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using GorillaExtensions;
 using GorillaHistoricalTeleporter.Extensions;
 using GorillaHistoricalTeleporter.Tools;
-using GT_CustomMapSupportRuntime;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace GorillaHistoricalTeleporter.Behaviours
@@ -27,10 +27,10 @@ namespace GorillaHistoricalTeleporter.Behaviours
 
             // too lazy to fix this thing
             // teleporterDecor.transform.localPosition = new Vector3(0.0073f, -0.4491f, 0.0255f);
-            teleporterDecor.transform.position = new Vector3(-64.3019f, 11.6895f, -80.6837f);
+            teleporterDecor.transform.position = new Vector3(-64.3019f, 11.7295f, -80.6837f);
             teleporterDecor.transform.localScale = Vector3.one * 0.45f;
             teleporterDecor.transform.rotation = Quaternion.identity;
-            
+
             teleporterDecor.GetComponentsInChildren<MeshRenderer>(true)
                 .Where(renderer => renderer is not null && renderer.gameObject.name == "Cylinder")
                 .ForEach(renderer =>
@@ -43,8 +43,8 @@ namespace GorillaHistoricalTeleporter.Behaviours
             teleporterDecor.GetComponentsInChildren<MeshCollider>(true)
                 .ForEach(collider =>
                 {
-                    if (collider.GetComponent<GorillaSurfaceOverride>() is null)
-                        collider.gameObject.AddComponent<GorillaSurfaceOverride>().overrideIndex = (int)SurfaceSoundOverride.ConcreteHit;
+                    GorillaSurfaceOverride surfaceOverride = collider.gameObject.GetOrAddComponent<GorillaSurfaceOverride>();
+                    surfaceOverride.overrideIndex = 0;
                 });
 
             teleporterDecor.AddComponent<VStumpExternalTrigger>().Teleporter = Teleporter;
