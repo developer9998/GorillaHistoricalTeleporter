@@ -10,7 +10,7 @@ namespace GorillaHistoricalTeleporter.Patches
         [HarmonyPatch(nameof(VirtualStumpTeleporter.OnEnable)), HarmonyPrefix]
         public static void EnablePatch(VirtualStumpTeleporter __instance)
         {
-            if (__instance.entrancePoint == GTZone.forest && !__instance.GetComponent<VStumpTeleportAddon>())
+            if (__instance.entranceZone == GTZone.forest && !__instance.GetComponent<VStumpTeleportAddon>())
                 __instance.gameObject.AddComponent<VStumpTeleportAddon>();
         }
 
@@ -21,16 +21,16 @@ namespace GorillaHistoricalTeleporter.Patches
                 Object.Destroy(component);
         }
 
-        [HarmonyPatch(nameof(VirtualStumpTeleporter.ShowHandHolds)), HarmonyPrefix]
-        public static bool ShowHandHoldsPatch(VirtualStumpTeleporter __instance)
+        [HarmonyPatch("AllowAccess"), HarmonyPrefix]
+        public static bool AllowAccessPatch(VirtualStumpTeleporter __instance)
         {
-            return !__instance.TryGetComponent(out VStumpTeleportAddon component) || component.ShowHandHolds();
+            return !__instance.TryGetComponent(out VStumpTeleportAddon component) || component.AllowAccess();
         }
 
-        [HarmonyPatch(nameof(VirtualStumpTeleporter.HideHandHolds)), HarmonyPrefix]
-        public static bool HideHandHoldsPatch(VirtualStumpTeleporter __instance)
+        [HarmonyPatch("DenyAccess"), HarmonyPrefix]
+        public static bool DenyAccessPatch(VirtualStumpTeleporter __instance)
         {
-            return !__instance.TryGetComponent(out VStumpTeleportAddon component) || component.HideHandHolds();
+            return !__instance.TryGetComponent(out VStumpTeleportAddon component) || component.DenyAccess();
         }
 
         [HarmonyPatch(nameof(VirtualStumpTeleporter.ShowCountdownText)), HarmonyPrefix]

@@ -11,11 +11,8 @@ namespace GorillaHistoricalTeleporter.Behaviours
     public class VStumpTeleportAddon : MonoBehaviour
     {
         public VirtualStumpTeleporter Teleporter;
-
         private float stayInTriggerDuration;
-
         private GameObject teleporterDecor;
-
         private GameObject treeRoom, stumpVRHeadset;
 
         public async Task Awake()
@@ -27,9 +24,13 @@ namespace GorillaHistoricalTeleporter.Behaviours
             GetComponent<Collider>().enabled = false;
 
             teleporterDecor = Instantiate(await AssetLoader.LoadAsset<GameObject>("Teleporter"), transform.parent.parent);
-            teleporterDecor.transform.localPosition = new Vector3(0.0073f, -0.4491f, 0.0255f);
+
+            // too lazy to fix this thing
+            // teleporterDecor.transform.localPosition = new Vector3(0.0073f, -0.4491f, 0.0255f);
+            teleporterDecor.transform.position = new Vector3(-64.3019f, 11.6895f, -80.6837f);
             teleporterDecor.transform.localScale = Vector3.one * 0.45f;
             teleporterDecor.transform.rotation = Quaternion.identity;
+            
             teleporterDecor.GetComponentsInChildren<MeshRenderer>(true)
                 .Where(renderer => renderer is not null && renderer.gameObject.name == "Cylinder")
                 .ForEach(renderer =>
@@ -38,6 +39,7 @@ namespace GorillaHistoricalTeleporter.Behaviours
                     Vector2 textureScale = material.GetTextureScale("_Gradient");
                     material.SetTextureScale("_Gradient", new Vector2(textureScale.x / 0.45f, textureScale.y / 0.45f));
                 });
+
             teleporterDecor.GetComponentsInChildren<MeshCollider>(true)
                 .ForEach(collider =>
                 {
@@ -55,62 +57,32 @@ namespace GorillaHistoricalTeleporter.Behaviours
         public void OnDestroy()
         {
             GetComponent<Collider>().enabled = true;
-
             Teleporter.stayInTriggerDuration = stayInTriggerDuration;
-            Teleporter.ShowHandHolds();
-
-            if (teleporterDecor)
-                Destroy(teleporterDecor);
-
+            SetActive(true);
             ConfigureHeadset(true, true);
+            if (teleporterDecor) Destroy(teleporterDecor);
         }
 
-        public void OnUGCEnabled()
-            => SetActive(true);
+        public void OnUGCEnabled() => SetActive(true);
+        public void OnUGCDisabled() => SetActive(false);
 
-        public void OnUGCDisabled()
-            => SetActive(false);
+        public bool HideCountdownText() => true;
+        public bool ShowCountdownText() => true;
+        public bool UpdateCountdownText() => true;
 
-        public bool HideHandHolds()
-            => true;
-
-        public bool ShowHandHolds()
-        {
-            Teleporter.HideHandHolds();
-            return false;
-        }
-
-        public bool HideCountdownText()
-            => true;
-
-        public bool ShowCountdownText()
-        {
-            Teleporter.HideCountdownText();
-            return false;
-        }
-
-        public bool UpdateCountdownText()
-        {
-            Teleporter.HideCountdownText();
-            return false;
-        }
+        public bool AllowAccess() => true;
+        public bool DenyAccess() => true;
 
         public void SetActive(bool isActive)
         {
-            if (teleporterDecor is null)
-                return;
-
-            if (teleporterDecor.transform.Find("Active") is Transform active)
-                active.gameObject.SetActive(isActive);
-            if (teleporterDecor.transform.Find("Inactive") is Transform inactive)
-                inactive.gameObject.SetActive(!isActive);
+            if (teleporterDecor is null) return;
+            if (teleporterDecor.transform.Find("Active") is Transform active) active.gameObject.SetActive(isActive);
+            if (teleporterDecor.transform.Find("Inactive") is Transform inactive) inactive.gameObject.SetActive(!isActive);
         }
 
         public void ConfigureHeadset(bool renderMeshes, bool enableColliders)
         {
-            if (stumpVRHeadset is null)
-                return;
-
+            if (stumpVRHeadset is null) return;
             foreach (Transform child in stumpVRHeadset.transform)
             {
                 if (child.GetComponent<MeshRenderer>() is MeshRenderer renderer)
